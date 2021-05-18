@@ -6,10 +6,13 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 export default function SignUpScreen({ setToken }) {
   const [email, setEmail] = useState("");
@@ -17,20 +20,43 @@ export default function SignUpScreen({ setToken }) {
   const [description, setDescription] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  // const [disableBtn, setDisableBtn] = useState(true);
+
+  const navigation = useNavigation();
 
   // Request URL: https://express-airbnb-api.herokuapp.com/user/sign_up
 
   const handleSubmit = async () => {
-    const response = await axios.post(
-      "https://express-airbnb-api.herokuapp.com/user/sign_up",
-      {
-        email: email,
-        username: username,
-        description: description,
-        password: password,
+    try {
+      if (email && username && description && password) {
+        setDisableBtn(false);
+        if (password === confirmPassword) {
+          const response = await axios.post(
+            "https://express-airbnb-api.herokuapp.com/user/sign_up",
+            {
+              email: email,
+              username: username,
+              description: description,
+              password: password,
+            }
+          );
+          console.log("response ", response);
+          console.log("response.data ", response.data);
+          console.log("response.data.token ", response.data.token);
+
+          const userToken = response.data.token;
+          setToken(userToken);
+          alert("Welcome sunshine ☀️");
+        } else {
+          setErrorMessage("⛔️ Passwords are not the same.");
+        }
+      } else {
+        setErrorMessage("⛔️ Please fill all fields.");
       }
-    );
-    console.log(response.data);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -70,40 +96,61 @@ export default function SignUpScreen({ setToken }) {
           }}
           value={description}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="password"
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            setPassword(text);
-          }}
-          value={password}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="confirm password"
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            setConfirmPassword(text);
-          }}
-          value={confirmPassword}
-        />
+        <View style={styles.iconEyeWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="password"
+            secureTextEntry={true}
+            onChangeText={(text) => {
+              setPassword(text);
+            }}
+            value={password}
+          />
+          <Ionicons
+            style={styles.iconEye}
+            name="eye"
+            size={28}
+            color="#D3D3D3"
+          />
+        </View>
+
+        <View style={styles.iconEyeWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="confirm password"
+            secureTextEntry={true}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+            }}
+            value={confirmPassword}
+          />
+          <Ionicons
+            style={styles.iconEye}
+            name="eye"
+            size={28}
+            color="#D3D3D3"
+          />
+        </View>
+
         <View style={styles.formButtons}>
           <TouchableOpacity
+            disable={false}
             style={[styles.btnWhite, styles.btnForm]}
             onPress={async () => {
-              const userToken = "secret-token";
-              setToken(userToken);
+              handleSubmit();
             }}
           >
             <Text style={[styles.btnText, styles.greyText]}>Sign up</Text>
           </TouchableOpacity>
+
+          <Text style={styles.errorMsg}>{errorMessage && errorMessage}</Text>
+
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("login");
             }}
           >
-            <Text style={styles.greyText}>
+            <Text style={[styles.greyText, styles.formRedirect]}>
               Already have an account? Sign in
             </Text>
           </TouchableOpacity>
@@ -150,6 +197,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
+  // btnDisable: {
+  //   height: 60,
+  //   width: "60%",
+  //   borderColor: "#D3D3D3",
+  //   borderWidth: 3,
+  //   borderRadius: 30,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
 
   // Sign in form
   formHeader: {
@@ -173,6 +229,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginBottom: 30,
   },
+  iconEyeWrapper: {
+    position: "relative",
+  },
+  iconEye: {
+    position: "absolute",
+    right: 0,
+  },
   textArea: {
     height: 100,
     width: "100%",
@@ -189,7 +252,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnForm: {
-    marginTop: 50,
+    marginTop: 30,
     marginBottom: 20,
+  },
+  formRedirect: {
+    marginBottom: 50,
+  },
+  errorMsg: {
+    marginBottom: 20,
+    color: "#EB5A62",
   },
 });

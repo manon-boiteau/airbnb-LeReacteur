@@ -7,10 +7,13 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+// import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 
 export default function SignInScreen({ setToken }) {
@@ -32,9 +35,13 @@ export default function SignInScreen({ setToken }) {
           }
         );
 
-        console.log("response ", response);
-      } else {
-        setErrorMessage("Please fill all fields.");
+        if (response.status === 200) {
+          const userToken = response.data.token;
+          setToken(userToken);
+          alert("Hello sunshine ☀️");
+        } else {
+          setErrorMessage("😕 Email or password is wrong.");
+        }
       }
     } catch (error) {
       console.log(error.message);
@@ -63,28 +70,42 @@ export default function SignInScreen({ setToken }) {
           keyboardType="email-address"
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="password"
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            setPassword(text);
-          }}
-          value={password}
-        />
+        <View style={styles.iconEyeWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="password"
+            secureTextEntry={true}
+            onChangeText={(text) => {
+              setPassword(text);
+            }}
+            value={password}
+          />
+          <Ionicons
+            style={styles.iconEye}
+            name="eye"
+            size={28}
+            color="#D3D3D3"
+          />
+          {/* <FontAwesome.Button
+            style={styles.iconEye}
+            name="eye"
+            color="#D3D3D3"
+            backgroundColor="transparent"
+          ></FontAwesome.Button> */}
+        </View>
 
         <View style={styles.formButtons}>
           <TouchableOpacity
             style={[styles.btnWhite, styles.btnForm]}
             onPress={async () => {
               handleSubmit();
-              const userToken = "secret-token";
-              setToken(userToken);
             }}
           >
             <Text style={[styles.btnText, styles.greyText]}>Sign in</Text>
           </TouchableOpacity>
-          <Text>{errorMessage && errorMessage}</Text>
+
+          <Text style={styles.errorMsg}>{errorMessage && errorMessage}</Text>
+
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("SignUp");
@@ -158,6 +179,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginBottom: 30,
   },
+  iconEyeWrapper: {
+    position: "relative",
+  },
+  iconEye: {
+    position: "absolute",
+    right: 0,
+  },
   formButtons: {
     justifyContent: "center",
     alignItems: "center",
@@ -165,5 +193,9 @@ const styles = StyleSheet.create({
   btnForm: {
     marginTop: 100,
     marginBottom: 20,
+  },
+  errorMsg: {
+    marginBottom: 20,
+    color: "#EB5A62",
   },
 });
