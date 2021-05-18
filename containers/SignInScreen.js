@@ -16,25 +16,25 @@ import axios from "axios";
 export default function SignInScreen({ setToken }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigation = useNavigation();
 
   // Request URL: https://express-airbnb-api.herokuapp.com/user/log_in
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        "https://express-airbnb-api.herokuapp.com/user/log_in",
-        {
-          email: email,
-          password: password,
-        }
-      );
-      console.log("response", response);
-      if (response.status === 200) {
-        alert("Welcome in Airbnb app 🤗");
-      } else if (response.status === 401) {
-        alert("⛔️ Email or passwor dis wrong");
+      if (email && password) {
+        const response = await axios.post(
+          "https://express-airbnb-api.herokuapp.com/user/log_in",
+          {
+            email: email,
+            password: password,
+          }
+        );
+
+        console.log("response ", response);
+      } else {
+        setErrorMessage("Please fill all fields.");
       }
     } catch (error) {
       console.log(error.message);
@@ -49,7 +49,7 @@ export default function SignInScreen({ setToken }) {
           source={require("../assets/airbnb-logo.png")}
           resizeMode="contain"
         />
-        <Text style={styles.h2}>Sign in</Text>
+        <Text style={[styles.h2, styles.greyText]}>Sign in</Text>
       </View>
 
       <View style={styles.wrapper}>
@@ -72,23 +72,27 @@ export default function SignInScreen({ setToken }) {
           }}
           value={password}
         />
-        {(!email || !password) && <Text>Please fill all fields</Text>}
-        <Button
-          title="Sign in"
-          onPress={async () => {
-            const userToken = "secret-token";
-            setToken(userToken);
-            handleSubmit();
-          }}
-        />
-        {/* <Text>{errorMessage}</Text> */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("SignUp");
-          }}
-        >
-          <Text>No account? Register</Text>
-        </TouchableOpacity>
+
+        <View style={styles.formButtons}>
+          <TouchableOpacity
+            style={[styles.btnWhite, styles.btnForm]}
+            onPress={async () => {
+              handleSubmit();
+              const userToken = "secret-token";
+              setToken(userToken);
+            }}
+          >
+            <Text style={[styles.btnText, styles.greyText]}>Sign in</Text>
+          </TouchableOpacity>
+          <Text>{errorMessage && errorMessage}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("SignUp");
+            }}
+          >
+            <Text style={styles.greyText}>No account? Register</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -104,9 +108,32 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
+
+  // Titles
   h2: {
     fontSize: 24,
     textAlign: "center",
+    fontWeight: "600",
+  },
+
+  // ----- Colors
+  greyText: {
+    color: "#7D7D7D",
+  },
+
+  // ----- Buttons
+  btnWhite: {
+    height: 60,
+    width: "60%",
+    borderColor: "#EB5A62",
+    borderWidth: 3,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnText: {
+    fontSize: 18,
+    fontWeight: "600",
   },
 
   // Sign in form
@@ -114,6 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 50,
     paddingBottom: 20,
+    marginBottom: 20,
   },
   imgLogo: {
     width: 80,
@@ -128,6 +156,14 @@ const styles = StyleSheet.create({
     borderLeftColor: "transparent",
     borderBottomColor: "#EB5A62",
     borderWidth: 2,
-    marginVertical: 40,
+    marginBottom: 30,
+  },
+  formButtons: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnForm: {
+    marginTop: 100,
+    marginBottom: 20,
   },
 });
