@@ -39,7 +39,7 @@ export default function HomeScreen() {
           "https://express-airbnb-api.herokuapp.com/rooms"
         );
 
-        console.log("=====", response.data);
+        // console.log("=====", response.data);
         setData(response.data);
         setLoading(false);
       } catch (e) {
@@ -65,10 +65,9 @@ export default function HomeScreen() {
           return (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Room", { id: item._id });
+                navigation.navigate("Room", { id: item.item._id });
               }}
             >
-              {/* <Text>{item.item._id}</Text> */}
               <View style={[styles.wrapper, styles.offersWrapper]}>
                 <View style={styles.offerImgWrapper}>
                   <Image
