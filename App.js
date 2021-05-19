@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -9,6 +10,7 @@ import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
+import { StatusBar } from "expo-status-bar";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -46,12 +48,12 @@ export default function App() {
     <NavigationContainer>
       {isLoading ? null : userToken === null ? ( // We haven't finished checking for the token yet
         // No token found, user isn't signed in
-        <Stack.Navigator>
-          <Stack.Screen name="SignIn">
-            {() => <SignInScreen setToken={setToken} />}
-          </Stack.Screen>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="SignUp">
-            {() => <SignUpScreen setToken={setToken} />}
+            {(props) => <SignUpScreen {...props} setToken={setToken} />}
+          </Stack.Screen>
+          <Stack.Screen name="SignIn">
+            {(props) => <SignInScreen {...props} setToken={setToken} />}
           </Stack.Screen>
         </Stack.Navigator>
       ) : (
@@ -79,9 +81,20 @@ export default function App() {
                       <Stack.Screen
                         name="Home"
                         options={{
-                          title: "My App",
-                          headerStyle: { backgroundColor: "red" },
-                          headerTitleStyle: { color: "white" },
+                          headerStyle: {
+                            backgroundColor: "white",
+                            height: 110,
+                          },
+                          headerTitle: (
+                            <Image
+                              style={{
+                                width: 35,
+                                height: 45,
+                              }}
+                              resizeMode="contain"
+                              source={require("./assets/airbnb-logo.png")}
+                            />
+                          ),
                         }}
                       >
                         {() => <HomeScreen />}

@@ -1,5 +1,7 @@
 // React & React Native - import
 import React from "react";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/core";
 import {
   Button,
   Text,
@@ -9,10 +11,17 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  ScrollView,
+  Platform,
+  SafeAreaView,
 } from "react-native";
-import { useState } from "react";
+
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 
 // Other packages - import
 import axios from "axios";
@@ -20,6 +29,8 @@ import axios from "axios";
 // Colors - import
 import colors from "../assets/colors";
 const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
+
+// Components - import
 
 export default function SignUpScreen({ setToken }) {
   const [loading, setLoading] = useState(false);
@@ -30,13 +41,14 @@ export default function SignUpScreen({ setToken }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [disabled, setDisabled] = useState(true);
+  const navigation = useNavigation();
 
   // Request URL: https://express-airbnb-api.herokuapp.com/user/sign_up
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      if (email && username && description && password) {
+      if (email && username && description && password && confirmPassword) {
         // setDisableBtn(false);
         if (password === confirmPassword) {
           const response = await axios.post(
@@ -63,7 +75,15 @@ export default function SignUpScreen({ setToken }) {
         setErrorMessage("⛔️ Please fill all fields.");
       }
     } catch (error) {
-      console.log(error.message);
+      console.log(error.response.data.error);
+      if (
+        error.response.data.error === "This email already has an account." ||
+        error.response.data.error === "This username already has an account."
+      ) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage("An error occurred.");
+      }
     }
   };
 
@@ -72,124 +92,140 @@ export default function SignUpScreen({ setToken }) {
       <ActivityIndicator size="large" color={mainPink} />
     </View>
   ) : (
-    <KeyboardAwareScrollView>
-      <View style={styles.formHeader}>
-        <Image
-          style={styles.imgLogo}
-          source={require("../assets/airbnb-logo.png")}
-          resizeMode="contain"
-        />
-        <Text style={[styles.h2, styles.greyText]}>Sign up</Text>
-      </View>
-      <View style={styles.wrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="email"
-          onChangeText={(text) => {
-            setEmail(text);
-          }}
-          value={email}
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="username"
-          onChangeText={(text) => {
-            setUsername(text);
-          }}
-          value={username}
-        />
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Describe yourself in a few words..."
-          multiline
-          numberOfLines={4}
-          onChangeText={(text) => {
-            setDescription(text);
-          }}
-          value={description}
-        />
-        <View style={styles.iconEyeWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="password"
-            secureTextEntry={true}
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
-            value={password}
-          />
-          <Ionicons
-            style={styles.iconEye}
-            name="eye"
-            size={28}
-            color={mainLightGrey}
-          />
-        </View>
-
-        <View style={styles.iconEyeWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="confirm password"
-            secureTextEntry={true}
-            onChangeText={(text) => {
-              setConfirmPassword(text);
-            }}
-            value={confirmPassword}
-          />
-          <Ionicons
-            style={styles.iconEye}
-            name="eye"
-            size={28}
-            color={mainLightGrey}
-          />
-        </View>
-
-        <View style={styles.formButtons}>
-          {email && username && description && password ? (
-            <TouchableOpacity
-              disabled={!disabled}
-              style={[styles.btnWhite, styles.btnForm]}
-              onPress={async () => {
-                handleSubmit();
+    <SafeAreaView>
+      <StatusBar style="dark" />
+      <ScrollView style={styles.scrollView}>
+        <KeyboardAwareScrollView>
+          <View style={styles.formHeader}>
+            <Image
+              style={styles.imgLogo}
+              source={require("../assets/airbnb-logo.png")}
+              resizeMode="contain"
+            />
+            <Text style={[styles.h2, styles.greyText]}>Sign up</Text>
+          </View>
+          <View style={styles.wrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="email"
+              onChangeText={(text) => {
+                setEmail(text);
               }}
-            >
-              <Text style={[styles.btnText, styles.greyText]}>Sign up</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              disabled={disabled}
-              style={[styles.btnDisabled, styles.btnForm]}
-              onPress={async () => {
-                handleSubmit();
+              value={email}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="username"
+              onChangeText={(text) => {
+                setUsername(text);
               }}
-            >
-              <Text style={[styles.btnText, styles.btnTextDisabled]}>
-                Sign up
+              value={username}
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Describe yourself in a few words..."
+              multiline
+              numberOfLines={4}
+              onChangeText={(text) => {
+                setDescription(text);
+              }}
+              value={description}
+            />
+            <View style={styles.iconEyeWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="password"
+                secureTextEntry={true}
+                onChangeText={(text) => {
+                  setPassword(text);
+                }}
+                value={password}
+              />
+              <Ionicons
+                style={styles.iconEye}
+                name="eye"
+                size={28}
+                color={mainLightGrey}
+              />
+            </View>
+
+            <View style={styles.iconEyeWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="confirm password"
+                secureTextEntry={true}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                }}
+                value={confirmPassword}
+              />
+              <Ionicons
+                style={styles.iconEye}
+                name="eye"
+                size={28}
+                color={mainLightGrey}
+              />
+            </View>
+
+            <View style={styles.formButtons}>
+              {email &&
+              username &&
+              description &&
+              password &&
+              confirmPassword ? (
+                <TouchableOpacity
+                  disabled={!disabled}
+                  style={[styles.btnWhite, styles.btnForm]}
+                  onPress={async () => {
+                    handleSubmit();
+                  }}
+                >
+                  <Text style={[styles.btnText, styles.greyText]}>Sign up</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  disabled={disabled}
+                  style={[styles.btnDisabled, styles.btnForm]}
+                  onPress={async () => {
+                    handleSubmit();
+                  }}
+                >
+                  <Text style={[styles.btnText, styles.btnTextDisabled]}>
+                    Sign up
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <Text style={styles.errorMsg}>
+                {errorMessage && errorMessage}
               </Text>
-            </TouchableOpacity>
-          )}
 
-          <Text style={styles.errorMsg}>{errorMessage && errorMessage}</Text>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("login");
-            }}
-          >
-            <Text style={[styles.greyText, styles.formRedirect]}>
-              Already have an account? Sign in
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </KeyboardAwareScrollView>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("SignIn");
+                }}
+              >
+                <Text style={[styles.greyText, styles.formRedirect]}>
+                  Already have an account? Sign in
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAwareScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 // CSS down below
 const styles = StyleSheet.create({
   // Global rules
+  scrollView: {
+    marginTop: Platform.OS === "android" ? Constants.statusBarHeight : 0,
+  },
   wrapper: {
     width: "80%",
     marginTop: 0,

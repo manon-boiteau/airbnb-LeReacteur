@@ -1,5 +1,6 @@
 // React & React Native - import
 import React from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import {
   Button,
@@ -12,9 +13,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 
 // Other packages - import
 import axios from "axios";
@@ -84,6 +84,7 @@ export default function SignInScreen({ setToken }) {
           }}
           value={email}
           keyboardType="email-address"
+          autoCapitalize="none"
         />
 
         <View style={styles.iconEyeWrapper}>
@@ -96,18 +97,13 @@ export default function SignInScreen({ setToken }) {
             }}
             value={password}
           />
+
           <Ionicons
             style={styles.iconEye}
             name="eye"
             size={28}
             color={mainLightGrey}
           />
-          {/* <FontAwesome.Button
-            style={styles.iconEye}
-            name="eye"
-            color="#D3D3D3"
-            backgroundColor="transparent"
-          ></FontAwesome.Button> */}
         </View>
 
         <View style={styles.formButtons}>
