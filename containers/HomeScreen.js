@@ -10,8 +10,10 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import LottieView from "lottie-react-native";
 
 // Other packages - import
 import axios from "axios";
@@ -61,10 +63,81 @@ export default function HomeScreen() {
         keyExtractor={(item) => item._id}
         renderItem={(item) => {
           return (
-            <View>
-              <Text>{item.price}</Text>
-              <Text>{item.description}</Text>
-            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Room", { id: item._id });
+              }}
+            >
+              {/* <Text>{item.item._id}</Text> */}
+              <View style={[styles.wrapper, styles.offersWrapper]}>
+                <View style={styles.offerImgWrapper}>
+                  <Image
+                    source={{ uri: item.item.photos[0].url }}
+                    style={styles.offerImg}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.offerPriceWrapper}>
+                    <Text style={styles.offerPrice}>{item.item.price} €</Text>
+                  </View>
+                </View>
+
+                <View style={styles.offerDetailsWrapper}>
+                  <View style={styles.offerDetailsBlocText}>
+                    <Text
+                      style={styles.h3}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.item.title}
+                    </Text>
+                    <View style={styles.reviewsWrapper}>
+                      <View style={styles.iconStarsWrapper}>
+                        <Entypo
+                          style={styles.iconStars}
+                          name="star"
+                          size={20}
+                          color="black"
+                        />
+                        <Entypo
+                          style={styles.iconStars}
+                          name="star"
+                          size={20}
+                          color="black"
+                        />
+                        <Entypo
+                          style={styles.iconStars}
+                          name="star"
+                          size={20}
+                          color="black"
+                        />
+                        <Entypo
+                          style={styles.iconStars}
+                          name="star"
+                          size={20}
+                          color="black"
+                        />
+                        <Entypo
+                          style={styles.iconStars}
+                          name="star"
+                          size={20}
+                          color="black"
+                        />
+                      </View>
+                      <Text style={[styles.lightGreyText, styles.reviewsText]}>
+                        {item.item.reviews} reviews
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.avatarImgWrapper}>
+                    <Image
+                      source={{ uri: item.item.user.account.photo.url }}
+                      style={styles.avatarImg}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
           );
         }}
       />
@@ -80,9 +153,91 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Global rules
+  wrapper: {
+    width: "80%",
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+
+  // Titles
+  h3: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 15,
+  },
+
+  // Colors
+  lightGreyText: {
+    color: textDisabled,
+  },
+
   // Loading
   loading: {
     flex: 1,
     justifyContent: "center",
+  },
+
+  // Offers
+  offersWrapper: {
+    marginBottom: 20,
+    borderBottomColor: mainLightGrey,
+    borderBottomWidth: 1,
+  },
+  // ----- img
+  offerImgWrapper: {
+    width: "100%",
+    height: 200,
+    marginBottom: 15,
+  },
+  offerImg: {
+    width: "100%",
+    height: "100%",
+    flex: 1,
+  },
+  offerPriceWrapper: {
+    backgroundColor: "black",
+    width: 80,
+    padding: 10,
+    alignItems: "center",
+    position: "absolute",
+    bottom: 10,
+  },
+  offerPrice: {
+    color: "white",
+  },
+  // ----- details
+  offerDetailsWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 10,
+  },
+  offerDetailsBlocText: {
+    width: "75%",
+  },
+  reviewsWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconStarsWrapper: {
+    flexDirection: "row",
+  },
+  iconStars: {
+    marginRight: 5,
+  },
+  reviewsText: {
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  avatarImgWrapper: {
+    width: "25%",
+    alignItems: "flex-end",
+  },
+  avatarImg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
 });

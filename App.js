@@ -5,12 +5,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+
+// Containers
 import HomeScreen from "./containers/HomeScreen";
+import RoomScreen from "./containers/RoomScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
-import { StatusBar } from "expo-status-bar";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -77,27 +81,41 @@ export default function App() {
                   }}
                 >
                   {() => (
-                    <Stack.Navigator>
+                    <Stack.Navigator
+                      screenOptions={{
+                        headerStyle: {
+                          backgroundColor: "white",
+                          height: 110,
+                        },
+                        headerTitle: (
+                          <Image
+                            style={{
+                              width: 35,
+                              height: 45,
+                            }}
+                            resizeMode="contain"
+                            source={require("./assets/airbnb-logo.png")}
+                          />
+                        ),
+                      }}
+                    >
+                      <Stack.Screen name="Home">
+                        {() => <HomeScreen />}
+                      </Stack.Screen>
+
                       <Stack.Screen
-                        name="Home"
+                        name="Room"
                         options={{
-                          headerStyle: {
-                            backgroundColor: "white",
-                            height: 110,
-                          },
-                          headerTitle: (
-                            <Image
-                              style={{
-                                width: 35,
-                                height: 45,
-                              }}
-                              resizeMode="contain"
-                              source={require("./assets/airbnb-logo.png")}
+                          headerLeft: () => (
+                            <AntDesign
+                              name="arrowleft"
+                              size={24}
+                              color="black"
                             />
                           ),
                         }}
                       >
-                        {() => <HomeScreen />}
+                        {(props) => <RoomScreen {...props} />}
                       </Stack.Screen>
 
                       <Stack.Screen
