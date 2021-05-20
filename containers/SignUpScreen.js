@@ -3,13 +3,9 @@ import React from "react";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import {
-  Button,
   Text,
-  TextInput,
   View,
-  Image,
   TouchableOpacity,
-  ActivityIndicator,
   StyleSheet,
   ScrollView,
   Platform,
@@ -17,7 +13,6 @@ import {
 } from "react-native";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,9 +26,12 @@ import colors from "../assets/colors";
 const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
 
 // Components - import
+import Logo from "../components/Logo";
+import TitleH2 from "../components/TitleH2";
+import Input from "../components/Input";
+import AreaInput from "../components/AreaInput";
 
 export default function SignUpScreen({ setToken }) {
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
@@ -46,10 +44,8 @@ export default function SignUpScreen({ setToken }) {
   // Request URL: https://express-airbnb-api.herokuapp.com/user/sign_up
 
   const handleSubmit = async () => {
-    setLoading(true);
     try {
       if (email && username && description && password && confirmPassword) {
-        // setDisableBtn(false);
         if (password === confirmPassword) {
           const response = await axios.post(
             "https://express-airbnb-api.herokuapp.com/user/sign_up",
@@ -66,12 +62,10 @@ export default function SignUpScreen({ setToken }) {
           if (response.data.token) {
             const userToken = response.data.token;
             setToken(userToken);
-            // alert("Welcome sunshine ☀️");
           }
         } else {
           setErrorMessage("⛔️ Passwords are not the same.");
         }
-        setLoading(false);
       } else {
         setErrorMessage("⛔️ Please fill all fields.");
       }
@@ -88,87 +82,70 @@ export default function SignUpScreen({ setToken }) {
     }
   };
 
-  return loading ? (
-    <View style={styles.loading}>
-      <ActivityIndicator size="large" color={mainPink} />
-    </View>
-  ) : (
+  return (
     <SafeAreaView>
       <StatusBar style="dark" />
       <ScrollView style={styles.scrollView}>
         <KeyboardAwareScrollView>
           <View style={styles.formHeader}>
-            <Image
-              style={styles.imgLogo}
-              source={require("../assets/airbnb-logo.png")}
-              resizeMode="contain"
-            />
-            <Text style={[styles.h2, styles.greyText]}>Sign up</Text>
+            <Logo />
+            <TitleH2 title="Sign Up" />
           </View>
+
           <View style={styles.wrapper}>
-            <TextInput
-              style={styles.input}
+            <Input
               placeholder="email"
-              onChangeText={(text) => {
-                setEmail(text);
-              }}
               value={email}
+              setFunction={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              secureTextEntry={false}
             />
-            <TextInput
-              style={styles.input}
+            <Input
               placeholder="username"
-              onChangeText={(text) => {
-                setUsername(text);
-              }}
               value={username}
+              setFunction={setUsername}
+              keyboardType="default"
               autoCapitalize="none"
+              secureTextEntry={false}
             />
-            <TextInput
-              style={[styles.input, styles.textArea]}
+            <AreaInput
               placeholder="Describe yourself in a few words..."
-              multiline
-              numberOfLines={4}
-              onChangeText={(text) => {
-                setDescription(text);
-              }}
-              value={description}
+              setFunction={setDescription}
+              multiline={true}
             />
             <View style={styles.iconEyeWrapper}>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="password"
-                secureTextEntry={true}
-                onChangeText={(text) => {
-                  setPassword(text);
-                }}
                 value={password}
+                setFunction={setPassword}
+                keyboardType="default"
+                autoCapitalize="none"
+                secureTextEntry={true}
               />
-              <Ionicons
+              {/* <Ionicons
                 style={styles.iconEye}
                 name="eye"
                 size={28}
                 color={mainLightGrey}
-              />
+              /> */}
             </View>
 
             <View style={styles.iconEyeWrapper}>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="confirm password"
-                secureTextEntry={true}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                }}
                 value={confirmPassword}
+                setFunction={setConfirmPassword}
+                keyboardType="default"
+                autoCapitalize="none"
+                secureTextEntry={true}
               />
-              <Ionicons
+              {/* <Ionicons
                 style={styles.iconEye}
                 name="eye"
                 size={28}
                 color={mainLightGrey}
-              />
+              /> */}
             </View>
 
             <View style={styles.formButtons}>
@@ -235,32 +212,25 @@ const styles = StyleSheet.create({
     marginRight: "auto",
   },
 
-  // Titles
-  h2: {
-    fontSize: 24,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-
   // ----- Colors
   greyText: {
     color: mainDarkGrey,
   },
 
   // ----- Buttons
-  btnWhite: {
-    height: 60,
-    width: "60%",
-    borderColor: mainPink,
-    borderWidth: 3,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnText: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
+  // btnWhite: {
+  //   height: 60,
+  //   width: "60%",
+  //   borderColor: mainPink,
+  //   borderWidth: 3,
+  //   borderRadius: 30,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
+  // btnText: {
+  //   fontSize: 18,
+  //   fontWeight: "600",
+  // },
   btnDisabled: {
     backgroundColor: mainLightGrey,
     height: 60,
@@ -288,21 +258,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginBottom: 20,
   },
-  imgLogo: {
-    width: 80,
-    height: 100,
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    width: "100%",
-    borderTopColor: "transparent",
-    borderRightColor: "transparent",
-    borderLeftColor: "transparent",
-    borderBottomColor: mainPink,
-    borderWidth: 2,
-    marginBottom: 30,
-  },
   iconEyeWrapper: {
     position: "relative",
   },
@@ -310,25 +265,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
   },
-  textArea: {
-    height: 100,
-    width: "100%",
-    paddingTop: 10,
-    paddingRight: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    borderTopColor: mainPink,
-    borderRightColor: mainPink,
-    borderLeftColor: mainPink,
-  },
   formButtons: {
     justifyContent: "center",
     alignItems: "center",
   },
-  btnForm: {
-    marginTop: 30,
-    marginBottom: 20,
-  },
+  // btnForm: {
+  //   marginTop: 30,
+  //   marginBottom: 20,
+  // },
   formRedirect: {
     marginBottom: 50,
   },

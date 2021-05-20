@@ -25,7 +25,7 @@ const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
 
 export default function HomeScreen() {
   // States
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
   const navigation = useNavigation();
@@ -34,7 +34,6 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
         const response = await axios.get(
           "https://express-airbnb-api.herokuapp.com/rooms"

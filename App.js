@@ -117,7 +117,7 @@ export default function App() {
                               size={24}
                               color="black"
                               // onPress={() => {
-                              //   navigation.goBack("Home");
+                              //   navigation.goBack();
                               // }}
                             />
                           ),

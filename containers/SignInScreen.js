@@ -2,18 +2,8 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/core";
-import {
-  Button,
-  Text,
-  TextInput,
-  View,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
 // Other packages - import
@@ -23,8 +13,12 @@ import axios from "axios";
 import colors from "../assets/colors";
 const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
 
+// Components - import
+import Logo from "../components/Logo";
+import TitleH2 from "../components/TitleH2";
+import Input from "../components/Input";
+
 export default function SignInScreen({ setToken }) {
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,7 +29,6 @@ export default function SignInScreen({ setToken }) {
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
       if (email && password) {
         setDisabled(true);
         const response = await axios.post(
@@ -49,61 +42,48 @@ export default function SignInScreen({ setToken }) {
         if (response.status === 200) {
           const userToken = response.data.token;
           setToken(userToken);
-          alert("Hello sunshine ☀️");
         } else {
           setErrorMessage("😕 Email or password is wrong.");
         }
       }
-      setLoading(false);
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  return loading ? (
-    <View style={styles.loading}>
-      <ActivityIndicator size="large" color={mainPink} />
-    </View>
-  ) : (
+  return (
     <KeyboardAwareScrollView>
       <View style={styles.formHeader}>
-        <Image
-          style={styles.imgLogo}
-          source={require("../assets/airbnb-logo.png")}
-          resizeMode="contain"
-        />
-        <Text style={[styles.h2, styles.greyText]}>Sign in</Text>
+        <Logo />
+        <TitleH2 title="Sign In" />
       </View>
 
       <View style={styles.wrapper}>
-        <TextInput
-          style={styles.input}
+        <Input
           placeholder="email"
-          onChangeText={(text) => {
-            setEmail(text);
-          }}
+          setFunction={setEmail}
           value={email}
           keyboardType="email-address"
           autoCapitalize="none"
+          secureTextEntry={false}
         />
 
         <View style={styles.iconEyeWrapper}>
-          <TextInput
-            style={styles.input}
+          <Input
             placeholder="password"
-            secureTextEntry={true}
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
+            setFunction={setPassword}
             value={password}
+            keyboardType="default"
+            autoCapitalize="none"
+            secureTextEntry={true}
           />
 
-          <Ionicons
+          {/* <Ionicons
             style={styles.iconEye}
             name="eye"
             size={28}
             color={mainLightGrey}
-          />
+          /> */}
         </View>
 
         <View style={styles.formButtons}>
@@ -158,13 +138,6 @@ const styles = StyleSheet.create({
     marginRight: "auto",
   },
 
-  // Titles
-  h2: {
-    fontSize: 24,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-
   // ----- Colors
   greyText: {
     color: mainDarkGrey,
@@ -211,21 +184,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginBottom: 20,
   },
-  imgLogo: {
-    width: 80,
-    height: 100,
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    width: "100%",
-    borderTopColor: "transparent",
-    borderRightColor: "transparent",
-    borderLeftColor: "transparent",
-    borderBottomColor: mainPink,
-    borderWidth: 2,
-    marginBottom: 30,
-  },
+
   iconEye: {
     position: "absolute",
     right: 0,
