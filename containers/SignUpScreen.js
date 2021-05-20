@@ -60,13 +60,14 @@ export default function SignUpScreen({ setToken }) {
               password: password,
             }
           );
-          // console.log("response ", response);
           // console.log("response.data ", response.data);
           // console.log("response.data.token ", response.data.token);
 
-          const userToken = response.data.token;
-          setToken(userToken);
-          alert("Welcome sunshine ☀️");
+          if (response.data.token) {
+            const userToken = response.data.token;
+            setToken(userToken);
+            // alert("Welcome sunshine ☀️");
+          }
         } else {
           setErrorMessage("⛔️ Passwords are not the same.");
         }

@@ -1,8 +1,6 @@
+// React & React Native - Imports
 import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/core";
 import {
-  Button,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
@@ -11,8 +9,11 @@ import {
   FlatList,
   Image,
 } from "react-native";
+// import LottieView from "lottie-react-native";
+
+// Expo - Imports
 import { StatusBar } from "expo-status-bar";
-import LottieView from "lottie-react-native";
+import { Entypo } from "@expo/vector-icons";
 
 // Other packages - import
 import axios from "axios";
@@ -21,15 +22,14 @@ import axios from "axios";
 import colors from "../assets/colors";
 const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
 
-// Icons - import
-import { Entypo } from "@expo/vector-icons";
-
-export default function RoomScreen({ navigation, route }) {
+export default function RoomScreen({ route }) {
   // States
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [fullText, setFullText] = useState(false);
 
   // Request URL: "https://express-airbnb-api.herokuapp.com/rooms/:id"
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -49,81 +49,90 @@ export default function RoomScreen({ navigation, route }) {
     fetchData();
   }, []);
 
+  // Function for stars rating
+  const displayStars = (val) => {
+    const tab = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= val) {
+        tab.push(
+          <Entypo
+            style={styles.iconStars}
+            name="star"
+            size={20}
+            color="gold"
+            key={i}
+          />
+        );
+      } else {
+        tab.push(
+          <Entypo
+            style={styles.iconStars}
+            name="star"
+            size={20}
+            color={textDisabled}
+            key={i}
+          />
+        );
+      }
+    }
+    return tab;
+  };
+
   return loading ? (
     <View style={styles.loading}>
       <ActivityIndicator size="large" color={mainPink} />
     </View>
   ) : (
-    <SafeAreaView>
+    <ScrollView>
       <StatusBar style="dark" />
-      <View>
-        <View>
-          <Image
-            source={{ uri: data.photos[0].url }}
-            style={{ width: 100, height: 100 }}
-          />
-          <Text>{data.price} €</Text>
+      <View style={styles.offersWrapper}>
+        <View style={styles.offerImgWrapper}>
+          <Image source={{ uri: data.photos[0].url }} style={styles.offerImg} />
+          <View style={styles.offerPriceWrapper}>
+            <Text style={styles.offerPrice}>{data.price} €</Text>
+          </View>
         </View>
 
-        <View>
-          <View>
-            <Text>{data.title}</Text>
+        <View style={[styles.wrapper, styles.offerDetailsWrapper]}>
+          <View style={styles.offerDetailsBlocText}>
+            <Text style={styles.h3}>{data.title}</Text>
 
-            <View>
-              <Entypo
-                style={styles.iconStars}
-                name="star"
-                size={20}
-                color="black"
-              />
-              <Entypo
-                style={styles.iconStars}
-                name="star"
-                size={20}
-                color="black"
-              />
-              <Entypo
-                style={styles.iconStars}
-                name="star"
-                size={20}
-                color="black"
-              />
-              <Entypo
-                style={styles.iconStars}
-                name="star"
-                size={20}
-                color="black"
-              />
-              <Entypo
-                style={styles.iconStars}
-                name="star"
-                size={20}
-                color="black"
-              />
-              <Text>{data.reviews} reviews</Text>
-            </View>
-            <View>
-              <Image
-                source={{ uri: data.user.account.photo.url }}
-                style={{ width: 100, height: 100 }}
-              />
+            <View style={styles.reviewsWrapper}>
+              <View style={styles.iconStarsWrapper}>
+                {displayStars(data.ratingValue)}
+              </View>
+              <Text style={[styles.lightGreyText, styles.reviewsText]}>
+                {data.reviews} reviews
+              </Text>
             </View>
           </View>
-          <View>
-            <Text>{data.description}</Text>
+          <View style={styles.avatarImgWrapper}>
+            <Image
+              source={{ uri: data.user.account.photo.url }}
+              style={styles.avatarImg}
+              resizeMode="contain"
+            />
           </View>
+        </View>
+        <View style={styles.wrapper}>
+          <Text
+            numberOfLines={!fullText ? 3 : null}
+            onPress={() => {
+              setFullText(!fullText);
+            }}
+          >
+            {data.description}
+          </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
-
-  //   return <Text>Hello</Text>;
 }
 
 const styles = StyleSheet.create({
   // Global rules
   wrapper: {
-    width: "80%",
+    width: "90%",
     marginTop: 0,
     marginBottom: 0,
     marginLeft: "auto",
@@ -151,8 +160,6 @@ const styles = StyleSheet.create({
   // Offers
   offersWrapper: {
     marginBottom: 20,
-    borderBottomColor: mainLightGrey,
-    borderBottomWidth: 1,
   },
   // ----- img
   offerImgWrapper: {

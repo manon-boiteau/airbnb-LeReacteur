@@ -1,14 +1,18 @@
+// React & React Native - Imports
 import React, { useState, useEffect } from "react";
+// import { useNavigation } from "@react-navigation/core";
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+// Expo - Imports
 import { Ionicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
-// Containers
+// Containers - Imports
 import HomeScreen from "./containers/HomeScreen";
 import RoomScreen from "./containers/RoomScreen";
 import ProfileScreen from "./containers/ProfileScreen";
@@ -23,11 +27,13 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
 
+  // const navigation = useNavigation();
+
   const setToken = async (token) => {
     if (token) {
-      AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userToken", token);
     } else {
-      AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("userToken");
     }
 
     setUserToken(token);
@@ -67,7 +73,7 @@ export default function App() {
             {() => (
               <Tab.Navigator
                 tabBarOptions={{
-                  activeTintColor: "tomato",
+                  activeTintColor: "#EB5A62",
                   inactiveTintColor: "gray",
                 }}
               >
@@ -84,7 +90,6 @@ export default function App() {
                     <Stack.Navigator
                       screenOptions={{
                         headerStyle: {
-                          backgroundColor: "white",
                           height: 110,
                         },
                         headerTitle: (
@@ -100,7 +105,7 @@ export default function App() {
                       }}
                     >
                       <Stack.Screen name="Home">
-                        {() => <HomeScreen />}
+                        {(props) => <HomeScreen {...props} />}
                       </Stack.Screen>
 
                       <Stack.Screen
@@ -111,6 +116,9 @@ export default function App() {
                               name="arrowleft"
                               size={24}
                               color="black"
+                              // onPress={() => {
+                              //   navigation.goBack("Home");
+                              // }}
                             />
                           ),
                         }}
@@ -118,14 +126,14 @@ export default function App() {
                         {(props) => <RoomScreen {...props} />}
                       </Stack.Screen>
 
-                      <Stack.Screen
+                      {/* <Stack.Screen
                         name="Profile"
                         options={{
                           title: "User Profile",
                         }}
                       >
                         {() => <ProfileScreen />}
-                      </Stack.Screen>
+                      </Stack.Screen> */}
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
