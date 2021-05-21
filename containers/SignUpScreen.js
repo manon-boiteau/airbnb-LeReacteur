@@ -11,9 +11,9 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+// Expo - Imports
 import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -61,7 +61,8 @@ export default function SignUpScreen({ setToken }) {
 
           if (response.data.token) {
             const userToken = response.data.token;
-            setToken(userToken);
+            const userId = response.data.id;
+            setToken(userToken, userId);
           }
         } else {
           setErrorMessage("⛔️ Passwords are not the same.");
@@ -110,6 +111,8 @@ export default function SignUpScreen({ setToken }) {
               secureTextEntry={false}
             />
             <AreaInput
+              placeholder="Describe yourself in a few words..."
+              value={description}
               placeholder="Describe yourself in a few words..."
               setFunction={setDescription}
               multiline={true}

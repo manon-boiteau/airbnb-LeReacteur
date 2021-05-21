@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
-  FlatList,
   Image,
   Dimensions,
 } from "react-native";
@@ -16,24 +15,19 @@ import MapView from "react-native-maps";
 // Expo - Imports
 import { StatusBar } from "expo-status-bar";
 import { Entypo } from "@expo/vector-icons";
-// (Package for user's location authorization)
-import * as Location from "expo-location";
 
 // Other packages - import
 import axios from "axios";
 
 // Colors - import
 import colors from "../assets/colors";
-const { mainPink, mainDarkGrey, mainLightGrey, textDisabled } = colors;
+const { mainPink, textDisabled } = colors;
 
 export default function RoomScreen({ route }) {
   // States
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [fullText, setFullText] = useState(false);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
-  const [results, setResults] = useState([]);
 
   // Request URL: "https://express-airbnb-api.herokuapp.com/rooms/:id"
 
@@ -53,39 +47,6 @@ export default function RoomScreen({ route }) {
       }
     };
     fetchData();
-
-    // Request URL with params: `https://express-airbnb-api.herokuapp.com/rooms/around?latitude=${latitude}&longitude=${longitude}`
-    // Request URL with NO params: "https://express-airbnb-api.herokuapp.com/rooms/around"
-
-    const getPermission = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        // console.log("status ", status);
-
-        if (status === "granted") {
-          const location = await Location.getCurrentPositionAsync();
-          // console.log(location);
-          setLatitude(location.coords.latitude);
-          setLongitude(location.coords.longitude);
-
-          const result = await axios.get(
-            `https://express-airbnb-api.herokuapp.com/rooms/around?latitude=${latitude}&longitude=${longitude}`
-          );
-          // console.log("-----> result.data ", result.data);
-          setResults(result.data);
-        } else {
-          // alert("⛔️ Acces unauthorized.");
-          const result = await axios.get(
-            `https://express-airbnb-api.herokuapp.com/rooms/around`
-          );
-          // console.log("-----> result.data ", result.data);
-          setResults(result.data);
-        }
-      } catch (e) {
-        console.log(e.message);
-      }
-    };
-    getPermission();
   }, []);
 
   // Function for stars rating
@@ -172,25 +133,19 @@ export default function RoomScreen({ route }) {
         <MapView
           style={styles.map}
           initialRegion={{
-            latitude: 48.856614,
-            longitude: 2.3522219,
+            latitude: data.location[1],
+            longitude: data.location[0],
             latitudeDelta: 0.1,
             longitudeDelta: 0.1,
           }}
           showsUserLocation={true}
         >
-          {results.map((el, index) => {
-            // console.log(el);
-            return (
-              <MapView.Marker
-                key={index}
-                coordinate={{
-                  latitude: el.location[1],
-                  longitude: el.location[0],
-                }}
-              />
-            );
-          })}
+          <MapView.Marker
+            coordinate={{
+              latitude: data.location[1],
+              longitude: data.location[0],
+            }}
+          />
         </MapView>
       </View>
     </ScrollView>
@@ -285,7 +240,6 @@ const styles = StyleSheet.create({
   },
   map: {
     width: Dimensions.get("window").width,
-    // height: Dimensions.get("window").height,
     height: 300,
   },
 });

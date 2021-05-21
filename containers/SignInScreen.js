@@ -41,7 +41,8 @@ export default function SignInScreen({ setToken }) {
 
         if (response.status === 200) {
           const userToken = response.data.token;
-          setToken(userToken);
+          const userId = response.data.id;
+          setToken(userToken, userId);
         } else {
           setErrorMessage("😕 Email or password is wrong.");
         }

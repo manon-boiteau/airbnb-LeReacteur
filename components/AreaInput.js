@@ -6,11 +6,12 @@ import { TextInput, StyleSheet } from "react-native";
 import colors from "../assets/colors";
 const { mainPink } = colors;
 
-const AreaInput = ({ placeholder, setFunction, multiline }) => {
+const AreaInput = ({ placeholder, setFunction, multiline, value }) => {
   return (
     <TextInput
       style={styles.textArea}
       placeholder={placeholder}
+      value={value}
       onChangeText={(text) => {
         setFunction(text);
       }}
